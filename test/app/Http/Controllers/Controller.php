@@ -477,6 +477,11 @@ abstract class Controller extends BaseController {
 		
 		if($global == 0 )
 			$data['entry_by'] = \Session::get('uid');
+
+		//bb
+		\Session::put('club_id',1);
+		$data['club_id'] = \Session::get('club_id');;
+			
 		/* Added for Compatibility laravel 5.2 */
 		$values = array();
 		foreach($data as $key=>$val)
@@ -760,6 +765,10 @@ function detailviewsave( $model ,$request , $detail , $id )
 
 			if($global == 0 )
 				$data['entry_by'] = \Session::get('uid');
+
+			//bb Force le club
+			$data['club_id'] = \Session::get('club_id');
+				
 			\DB::table($detail['table'])->insert($data);
 		}			
 	}

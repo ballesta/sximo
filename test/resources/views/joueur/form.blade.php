@@ -32,9 +32,9 @@
 										 </div>
 									  </div> 					
 									  <div class="form-group  " >
-										<label for="Club" class=" control-label col-md-4 text-left"> Club </label>
+										<label for="Club" class=" control-label col-md-4 text-left"> Club <span class="asterix"> * </span></label>
 										<div class="col-md-6">
-										  <select name='club_id' rows='5' id='club_id' class='select2 '   ></select> 
+										  <select name='club_id' rows='5' id='club_id' class='select2 ' required  ></select> 
 										 </div> 
 										 <div class="col-md-2">
 										 	
