@@ -1,0 +1,12 @@
+21/08/2016
+	Dossier "licences"
+		Licences téléchargées de code canyon
+			pour report sur site Sixmo
+	Dossier "originaux"
+		Fichier zip téléchargés 
+			de CodeCanyon
+			Directement de Sixmo
+		Sources décompressés bruts pour examen des sources originaux
+		dans le même dossier que le zip
+	Dossier "tests"
+		Pour tests des 3 produits
