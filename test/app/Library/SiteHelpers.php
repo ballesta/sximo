@@ -733,6 +733,31 @@ public static function alphaID($in, $to_num = false, $pad_up = false, $passKey =
 				
 				} elseif($format_as =='date') {
 					$val = "{{ date('".$format_value."',strtotime(\$row->".$grid['field'].")) }}";
+				} else if($format_as =='function'){
+					// Format To Custom Function 
+
+					$c 	= explode("|", $format_value);
+					if(isset($c[2]))
+					{
+						$args = explode(':',$c[2]);
+						if(count($args)>=2)
+						{
+							$ar = '';
+							foreach($args as $a)
+							{
+								$ar .= '$row->'.$a.',';
+							}
+							$val = '<?php $params = array('. substr($ar,0,($ar)-1).') ; ?>';
+							$val .= '<?php echo '.$c[0].'::'.$c[1].'($params) ?>';
+							
+						} else {
+							$val 	= "{{ ".$c[0]."::".$c[1]."(\$row->".$c[2].") }}";
+						}
+
+					} else {
+						$val = $format_value;	
+					} 				
+					
 				} else {
 					if($conn['valid'] =='1') {
 						$val = $val;
@@ -759,7 +784,7 @@ public static function alphaID($in, $to_num = false, $pad_up = false, $passKey =
 				$f .= $limited_start;
 				$f .= "
 					<tr>
-						<td width='30%' class='label-view text-right'>".$grid['label']."</td>
+						<td width='30%' class='label-view text-right'>{{ SiteHelpers::activeLang('".$grid['label']."', (isset(\$fields['".$grid['field']."']['language'])? \$fields['".$grid['field']."']['language'] : array())) }}</td>
 						<td>".$val." </td>
 						
 					</tr>
@@ -1333,7 +1358,30 @@ public static function alphaID($in, $to_num = false, $pad_up = false, $passKey =
 					$value = '';	
 				}
 								
+		} elseif ($format_as =='function'){
 
+			$val = $format_value;
+			foreach($row as $k=>$i)
+			{
+				if (preg_match("/$k/",$val))
+					$val = str_replace($k,$i,$val);				
+			}
+			$c = explode("|",$val);
+			
+			if(isset($c[0]) && class_exists($c[0]) )
+			{
+				$args = explode(':',$c[2]);
+				if(count($args)>=2)
+				{
+					$value = call_user_func( array($c[0],$c[1]), $args); 	
+				} else {
+					$value = call_user_func( array($c[0],$c[1]), str_replace(":","','",$c[2])); 	
+				}
+				
+			} else {
+					$value = 'Class Doest Not Exists';
+			}
+		
 		}  else {
 
 		}

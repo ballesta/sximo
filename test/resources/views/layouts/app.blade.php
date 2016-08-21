@@ -57,6 +57,11 @@
 		<![endif]-->		
 
 
+		<!-- AJax -->
+		<link href="{{ asset('sximo/js/plugins/ajax/ajaxSximo.css')}}" rel="stylesheet"> 
+		<script type="text/javascript" src="{{ asset('sximo/js/plugins/ajax/ajaxSximo.js') }}"></script>
+
+		<!-- End Ajax -->
 	
   	</head>
   	<body class="sxim-init" >

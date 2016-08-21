@@ -62,12 +62,11 @@ abstract class Controller extends BaseController {
 	function getComboselect( Request $request)
 	{
 
-
 		if($request->ajax() == true && \Auth::check() == true)
 		{
 			$param = explode(':',$request->input('filter'));
 			$parent = (!is_null($request->input('parent')) ? $request->input('parent') : null);
-			$limit = (!is_null($request->get('limit')) ? $request->get('limit') : null);
+			$limit = (!is_null($request->input('limit')) ? $request->input('limit') : null);
 			$rows = $this->model->getComboselect($param,$limit,$parent);
 			$items = array();
 		
@@ -80,7 +79,7 @@ abstract class Controller extends BaseController {
 				{
 					if($val != "") $value .= $row->{$val}." ";
 				}
-				$items[] = array($row->{$param['1']}, $value); 	
+				$items[] = array($row->{$param['1']} , $value); 	
 	
 			}
 			
@@ -284,7 +283,7 @@ abstract class Controller extends BaseController {
 			} else if($form['required'] == 'url'){
 				$rules[$form['field']] = 'required|active_url';
 			} else {
-	
+				
 				if( $form['type'] =='file')
 				{
 					if(!is_null(Input::file($form['field'])))
@@ -309,29 +308,48 @@ abstract class Controller extends BaseController {
 		return $rules ;
 	}	
 
+	function validateListError( $rules )
+    {
+        $errMsg = \Lang::get('core.note_error') ;
+        $errMsg .= '<hr /> <ul>';
+        foreach($rules as $key=>$val)
+        {
+            $errMsg .= '<li>'.$key.' : '.$val[0].'</li>';
+        }
+        $errMsg .= '</li>'; 
+        return $errMsg;
+    }
+
 	function validatePost(  $table )
 	{	
 		$request = new Request;	
 	///	return json_encode($_POST);	
+
 		$str = $this->info['config']['forms'];
-		//echo '<pre>';print_r($_POST);echo '</pre>'; exit;
+
+	//	echo '<pre>';print_r($str);echo '</pre>';
+
 		$data = array();
 		foreach($str as $f){
 			$field = $f['field'];
 			if($f['view'] ==1) 
 			{
+				
+
 				if($f['type'] =='textarea_editor' || $f['type'] =='textarea')
 				{
-					// Handle Text Editor 
 					$content = (isset($_POST[$field]) ? $_POST[$field] : '');
 					 $data[$field] = $content;
 				} else {
-					// Handle text Input
+
+	
 					if(isset($_POST[$field]))
 					{
 						$data[$field] = $_POST[$field];				
 					}
-					// Handle FILE OR IMAGE Upload 
+					// if post is file or image		
+
+
 					if($f['type'] =='file')
 					{	
 						$files ='';	
@@ -432,22 +450,16 @@ abstract class Controller extends BaseController {
 							$data[$field] = '0';	
 						}
 					}
-					// Handle Date 				
+					// if post is date						
 					if($f['type'] =='date')
 					{
 						$data[$field] = date("Y-m-d",strtotime($request->input($field)));
 					}
-
-					// Handle Date 				
-					if($f['type'] =='date_time')
-					{
-						$data[$field] = date("Y-m-d H:i:s",strtotime($request->input($field)));
-					}
-
 					
 					// if post is seelct multiple						
 					if($f['type'] =='select')
 					{
+						//echo '<pre>'; print_r( $_POST[$field] ); echo '</pre>'; 
 						if( isset($f['option']['select_multiple']) &&  $f['option']['select_multiple'] ==1 )
 						{
 							$multival = (is_array($_POST[$field]) ? implode(",",$_POST[$field]) :  $_POST[$field]); 
@@ -465,7 +477,6 @@ abstract class Controller extends BaseController {
 		
 		if($global == 0 )
 			$data['entry_by'] = \Session::get('uid');
-
 		/* Added for Compatibility laravel 5.2 */
 		$values = array();
 		foreach($data as $key=>$val)
@@ -473,6 +484,7 @@ abstract class Controller extends BaseController {
 			if($val !='') $values[$key] = $val;
 		}			
 		return $values;
+
 	}
 
 	function postFilter( Request $request)
@@ -537,15 +549,6 @@ abstract class Controller extends BaseController {
 			
 	}	
 
-	public function getRemovefiles( Request $request)
-	{
-		$files = '.'.$request->input('file');
-		if(file_exists($files) && $files !='')
-		{
-			unlink( $files);
-		}
-	}
-
 	public function getRemovecurrentfiles( Request $request)
 	{
 		$id 	= $request->input('id');
@@ -563,12 +566,22 @@ abstract class Controller extends BaseController {
 		}
 	}	
 
-	public function getSearch()
+	public function getRemovefiles( Request $request)
+	{
+		$files = '.'.$request->input('file');
+		if(file_exists($files) && $files !='')
+		{
+			unlink( $files);
+		}
+	}
+
+
+	public function getSearch( $mode = 'native' )
 	{
 
 		$this->data['tableForm'] 	= $this->info['config']['forms'];	
 		$this->data['tableGrid'] 	= $this->info['config']['grid'];
-
+		$this->data['searchMode'] 	= $mode ;
 		$this->data['pageUrl']		= url($this->module);
 		return view('sximo.module.utility.search',$this->data);
 	
@@ -597,15 +610,7 @@ abstract class Controller extends BaseController {
 		$content .= '<tr>';
 		foreach($fields as $f )
 		{
-			if($f['download'] =='1')
-			{
-				$limited = isset($field['limited']) ? $field['limited'] :'';
-				if(\SiteHelpers::filterColumn($limited ))
-				{
-					$content .= '<th style="background:#f9f9f9;">'. $f['label'] . '</th>';
-					
-				}
-			}	
+			if($f['download'] =='1') $content .= '<th style="background:#f9f9f9;">'. $f['label'] . '</th>';
 		}
 		$content .= '</tr>';
 		
@@ -614,16 +619,10 @@ abstract class Controller extends BaseController {
 			$content .= '<tr>';
 			foreach($fields as $f )
 			{
-					
-				if($f['download'] =='1')
-				{
-					$limited = isset($field['limited']) ? $field['limited'] :'';
-					if(\SiteHelpers::filterColumn($limited ))
-					{
-						$content .= '<td> '. \SiteHelpers::formatRows($row->{$f['field']},$f,$row) . '</td>';
-					}
-				}	
-	
+				if($f['download'] =='1'):
+					$conn = (isset($f['conn']) ? $f['conn'] : array() );					
+					$content .= '<td>'. \SiteHelpers::gridDisplay($row->$f['field'],$f['field'],$conn) . '</td>';
+				endif;	
 			}
 			$content .= '</tr>';
 		}
@@ -638,6 +637,46 @@ abstract class Controller extends BaseController {
 	
 	}	
 
+	public function getExport( $t = 'excel')
+	{
+		$info 		= $this->model->makeInfo( $this->module);
+		//$master  	= $this->buildMasterDetail(); 
+		$filter 	= (!is_null(Input::get('search')) ? $this->buildSearch() : '');
+		//$filter 	.=  $master['masterFilter'];			
+		$params 	= array(
+					'params'	=>''
+		);		
+		$results 	= $this->model->getRows( $params );
+		$fields		= $info['config']['grid'];
+		$rows		= $results['rows'];
+		$content 	= array(
+						'fields' => $fields,
+						'rows' => $rows,
+						'title' => $this->data['pageTitle'],
+					);
+		
+		if($t == 'word')
+		{			
+			 return view('sximo.module.utility.word',$content);
+			 
+		} else if($t == 'pdf') {		
+		 
+		 	$pdf = PDF::loadView('sximo.module.utility.pdf', $content);
+			return view($this->data['pageTitle'].'.pdf');
+			
+		} else if($t == 'csv') {		
+		 
+			return view('sximo.module.utility.csv',$content);
+			
+		} else if ($t == 'print') {
+		
+			 return view('sximo.module.utility.print',$content);
+			 
+		} else  {
+		
+			 return view('sximo.module.utility.excel',$content);
+		}	
+	}		
 
 	function getLookup( Request $request, $id)
 	{
@@ -677,13 +716,11 @@ abstract class Controller extends BaseController {
 	{
 		
 		$info = $model->makeInfo( $detail['module'] );
-
 		$params = array(
 			'params'	=> " And `".$detail['key']."` ='". $id ."'",
 			'global'	=> (isset($this->access['is_global']) ? $this->access['is_global'] : 0 )
 		);
 		$results = $model->getRows( $params );	
-		
 		$data['rowData']		= $results['rows'];
 		$data['tableGrid'] 		= $info['config']['grid'];
 		$data['tableForm'] 		= $info['config']['forms'];	
@@ -698,44 +735,33 @@ abstract class Controller extends BaseController {
 function detailviewsave( $model ,$request , $detail , $id )
 
 	{
+
 		\DB::table($detail['table'])->where($detail['key'],$request[$detail['key']])->delete();
-
 		$info = $model->makeInfo( $detail['module'] );
-
 		$access = $model->validAccess($info['id']);
-
 		$str = $info['config']['forms'];
-
 		$data = array($detail['master_key'] => $id );
-		 $global	= (isset($access['is_global']) ? $access['is_global'] : 0 );
+		$global	= (isset($access['is_global']) ? $access['is_global'] : 0 );
 
 		$total = count($request['counter']);
-
 		for($i=0; $i<$total;$i++)
 		{
 			foreach($str as $f){
-				$field = $f['field'];
-				if($f['view'] ==1)
-				{
-					if(isset($request['bulk_'.$field][$i]) && $request['bulk_'.$field][$i] !='')
 
+				$field = $f['field'];
+				if($f['view'] ==1) 
+				{
+					if(isset($request['bulk_'.$field][$i]))
 					{
 						$data[$f['field']] = $request['bulk_'.$field][$i];
 					}
-				}			
+				}
 			}	
+
 			if($global == 0 )
 				$data['entry_by'] = \Session::get('uid');
-
-			//print_r($data); exit;
 			\DB::table($detail['table'])->insert($data);
-
-		}	
-
-		
-
+		}			
 	}
-
-
 }
 

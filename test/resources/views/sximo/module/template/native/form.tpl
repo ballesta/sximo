@@ -3,18 +3,12 @@
 @section('content')
 
   <div class="page-content row">
-    <!-- Page header -->
 
- 
  	<div class="page-content-wrapper m-t">
 
 
 <div class="sbox">
-	<div class="sbox-title"> <h3> {{ $pageTitle }} <small>{{ $pageNote }}</small></h3>
-		<div class="sbox-tools" >
-			<a href="{{ url($pageModule.'?return='.$return) }}" class="btn btn-xs btn-white tips"  title="{{ Lang::get('core.btn_back') }}" ><i class="icon-backward"></i> {{ Lang::get('core.btn_back') }} </a> 
-		</div>
-	</div>
+	<div class="sbox-title"> <h3> {{ $pageTitle }} <small>{{ $pageNote }}</small></h3> </div>
 	<div class="sbox-content"> 	
 
 		<ul class="parsley-error-list">
@@ -38,7 +32,7 @@
 					<button type="button" onclick="location.href='{{ URL::to('{class}?return='.$return) }}' " class="btn btn-warning btn-sm "><i class="icon-cancel-circle2 "></i>  {{ Lang::get('core.sb_cancel') }} </button>
 					</div>	  
 			
-				  </div> 
+				  </div>
 		 
 		 {!! Form::close() !!}
 	</div>
@@ -49,7 +43,7 @@
 	$(document).ready(function() { 
 		{masterdetailjs}
 		{form_javascript} 
-
+		
 		$('.removeMultiFiles').on('click',function(){
 			var removeUrl = '{{ url("{class}/removefiles?file=")}}'+$(this).attr('url');
 			$(this).parent().remove();

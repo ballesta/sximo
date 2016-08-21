@@ -57,6 +57,11 @@
 		<![endif]-->		
 
 
+		<!-- AJax -->
+		<link href="<?php echo e(asset('sximo/js/plugins/ajax/ajaxSximo.css')); ?>" rel="stylesheet"> 
+		<script type="text/javascript" src="<?php echo e(asset('sximo/js/plugins/ajax/ajaxSximo.js')); ?>"></script>
+
+		<!-- End Ajax -->
 	
   	</head>
   	<body class="sxim-init" >
