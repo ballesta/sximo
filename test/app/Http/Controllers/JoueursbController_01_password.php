@@ -16,7 +16,6 @@ class JoueursbController extends Controller {
 
 	public function __construct()
 	{
-		
 		$this->beforeFilter('csrf', array('on'=>'post'));
 		$this->model = new Joueursb();
 		
@@ -28,7 +27,6 @@ class JoueursbController extends Controller {
 			'pageNote'	=>  $this->info['note'],
 			'pageModule'=> 'joueursb',
 			'return'	=> self::returnUrl()
-			
 		);
 		
 		\App::setLocale(CNF_LANG);
@@ -176,7 +174,6 @@ class JoueursbController extends Controller {
 
 	function postSave( Request $request)
 	{
-		 
 		$rules = $this->validateForm();
 		$validator = Validator::make($request->all(), $rules);	
 		if ($validator->passes()) {

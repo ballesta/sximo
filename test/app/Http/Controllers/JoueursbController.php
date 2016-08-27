@@ -185,12 +185,16 @@ class JoueursbController extends Controller {
 			//bb
 			if($request->input('id') =='')
 			{
+			    // Création : hacher
 				$data['password'] = \Hash::make(Input::get('password'));
 			} else {
+			    // Modification
 				if(Input::get('password') !='')
 				{
+				    // Mot de passe rempli : Hacher
 					$data['password'] = \Hash::make(Input::get('password'));
 				} else {
+					// Mot de passe non rempli: ignorer
 					unset($data['password']);
 				}
 			}
