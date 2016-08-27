@@ -1,0 +1,21 @@
+Forcer club_id à la valeur du club en session
+	http/controllers/Controller.php
+		Ajouté ligne 481
+			//bb Force club id to 1
+			//\Session::put('club_id',1);
+			//$data['club_id'] = \Session::get('club_id');;
+26/08/16
+	Mémoriser le club_id de l'utilisateur en session
+		Sur login
+		Mémoriser club_id
+	Filtrage par club
+		Avant le select des fichiers
+			Si champ 'club_id' présent dans module:
+				Si club_id de l'utilisateur en session:
+					Ajouter filtre sur 'club_id' = 'club_id' de la session
+		Dans la vue
+			Filtrer le club_id comme ci dessus
+				Ne laisser qu'un suel choix si le club_id est en session
+		Avant l'insertion			
+			Rien à faire car le seul choix possible est déjà filtré ci dessus
+			

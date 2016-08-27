@@ -169,7 +169,8 @@ class UserController extends Controller {
 							return Redirect::to('user/login')->with('message', \SiteHelpers::alert('error','Your Account is not active'));
 						}
 						
-					} else if($row->active=='2')
+					} 
+					else if($row->active=='2')
 					{
 
 						if($request->ajax() == true )
@@ -180,13 +181,21 @@ class UserController extends Controller {
 							\Auth::logout();
 							return Redirect::to('user/login')->with('message', \SiteHelpers::alert('error','Your Account is BLocked'));
 						}
-					} else {
+					} 
+					else 
+					{
 						\DB::table('tb_users')->where('id', '=',$row->id )->update(array('last_login' => date("Y-m-d H:i:s")));
 						\Session::put('uid', $row->id);
 						\Session::put('gid', $row->group_id);
 						\Session::put('eid', $row->email);
 						\Session::put('ll', $row->last_login);
-						\Session::put('fid', $row->first_name.' '. $row->last_name);	
+						\Session::put('fid', $row->first_name.' '. $row->last_name);
+						//bb
+						// Ajoute le club de l'utilisateur en session
+						\Session::put('club_id', $row->club_id);						
+						//--
+						\Session::put('ll', $row->last_login);
+						
 						if(\Session::get('lang') =='')
 						{
 							\Session::put('lang', CNF_LANG);	

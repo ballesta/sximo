@@ -58,7 +58,7 @@ abstract class Controller extends BaseController {
 		\DB::table('tb_users')->where('id',\Session::get('uid'))->update($data);   
 	} 	
 
-
+	//bb Ajouté filtrage sur club courant
 	function getComboselect( Request $request)
 	{
 
@@ -67,6 +67,7 @@ abstract class Controller extends BaseController {
 			$param = explode(':',$request->input('filter'));
 			$parent = (!is_null($request->input('parent')) ? $request->input('parent') : null);
 			$limit = (!is_null($request->input('limit')) ? $request->input('limit') : null);
+
 			$rows = $this->model->getComboselect($param,$limit,$parent);
 			$items = array();
 		
@@ -478,9 +479,9 @@ abstract class Controller extends BaseController {
 		if($global == 0 )
 			$data['entry_by'] = \Session::get('uid');
 
-		//bb
-		\Session::put('club_id',1);
-		$data['club_id'] = \Session::get('club_id');;
+		//bb Force club id to 1
+		//\Session::put('club_id',1);
+		//$data['club_id'] = \Session::get('club_id');
 			
 		/* Added for Compatibility laravel 5.2 */
 		$values = array();

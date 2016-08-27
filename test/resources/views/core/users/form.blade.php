@@ -33,11 +33,24 @@
 								  <div class="form-group  " >
 									<label for="Group / Level" class=" control-label col-md-4 text-left"> Group / Level <span class="asterix"> * </span></label>
 									<div class="col-md-6">
-									  <select name='group_id' rows='5' id='group_id' code='{$group_id}' 
-							class='select2 '  required  ></select> 
+									    <select name='group_id' rows='5' id='group_id' code='{$group_id}' 
+							                    class='select2 '  required  >
+									    </select> 
 									 </div> 
 									 <div class="col-md-2">
 									 	
+									 </div>
+								  </div> 					
+								  <div class="form-group  " >
+									<label for="Club id" class=" control-label col-md-4 text-left"> 
+									    Club <span class="asterix"> * </span>
+									</label>
+									<div class="col-md-6">
+									    <select name='club_id' rows='5' id='club_id' code='{$club_id}' 
+							                    class='select2 '  required  >
+									    </select> 
+									 </div> 
+									 <div class="col-md-2">
 									 </div>
 								  </div> 					
 								  <div class="form-group  " >
@@ -175,7 +188,11 @@
 		
 		$("#group_id").jCombo("{{ URL::to('core/users/comboselect?filter=tb_groups:group_id:name') }}",
 		{  selected_value : '{{ $row["group_id"] }}' });
-		 
+
+		$("#club_id").jCombo("{{ URL::to('core/users/comboselect?filter=foot_club:club_id:nom') }}",
+		{  selected_value : '{{ $row["club_id"] }}' });
+
+		
 	});
 	</script>		 
 @stop

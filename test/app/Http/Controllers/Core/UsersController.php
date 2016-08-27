@@ -173,8 +173,6 @@ class UsersController extends Controller {
 			
 			$id = $this->model->insertRow($data , $request->input('id'));
 
-
-
 			if(!is_null(Input::file('avatar')))
 			{
 				$updates = array();
@@ -198,13 +196,10 @@ class UsersController extends Controller {
 			}
 			
 			return Redirect::to($return)->with('messagetext',\Lang::get('core.note_success'))->with('msgstatus','success');
-			
 		} else {
-
 			return Redirect::to('core/users/update/'.$id)->with('messagetext',\Lang::get('core.note_error'))->with('msgstatus','error')
 			->withErrors($validator)->withInput();
 		}	
-	
 	}	
 
 	public function postDelete( Request $request)

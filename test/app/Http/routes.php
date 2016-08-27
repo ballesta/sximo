@@ -19,6 +19,13 @@ $active_multilang = defined('CNF_MULTILANG') ? CNF_LANG : 'en';
     \App::setLocale($lang);
 }   
 
+Route::get('/session', function () {
+    $club_id = \Session::get('club_id');
+	return  'club_id = ' . $club_id . '<hr>';
+	   
+});
+
+
 Route::get('/', 'HomeController@index');
 Route::controller('home', 'HomeController');
 
@@ -60,9 +67,7 @@ Route::group(['middleware' => 'auth' , 'middleware'=>'sximoauth'], function()
 		'sximo/tables'		=> 'Sximo\TablesController',
 		'sximo/code'		=> 'Sximo\CodeController'
 	]);			
-
-
-
+	
 });
 
 

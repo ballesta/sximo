@@ -1,0 +1,6 @@
+Forcer club_id à la valeur du club en session
+	http/controllers/Controller.php
+		Ajouté ligne 481
+			//bb Force club id to 1
+			//\Session::put('club_id',1);
+			//$data['club_id'] = \Session::get('club_id');;

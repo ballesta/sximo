@@ -1,0 +1,135 @@
+<?php $__env->startSection('content'); ?>
+
+  <div class="page-content row">
+
+ 	<div class="page-content-wrapper m-t">
+
+
+<div class="sbox">
+	<div class="sbox-title"> <h3> <?php echo e($pageTitle); ?> <small><?php echo e($pageNote); ?></small></h3> </div>
+	<div class="sbox-content"> 	
+
+		<ul class="parsley-error-list">
+			<?php foreach($errors->all() as $error): ?>
+				<li><?php echo e($error); ?></li>
+			<?php endforeach; ?>
+		</ul>	
+
+		 <?php echo Form::open(array('url'=>'joueursb/save?return='.$return, 'class'=>'form-horizontal','files' => true , 'parsley-validate'=>'','novalidate'=>' ')); ?>
+
+<div class="col-md-12">
+						<fieldset><legend> joueursB</legend>
+									
+									  <div class="form-group  " >
+										<label for="Id" class=" control-label col-md-4 text-left"> Id </label>
+										<div class="col-md-6">
+										  <?php echo Form::text('id', $row['id'],array('class'=>'form-control', 'placeholder'=>'',   )); ?> 
+										 </div> 
+										 <div class="col-md-2">
+										 	
+										 </div>
+									  </div> 					
+									  <div class="form-group  " >
+										<label for="Photo" class=" control-label col-md-4 text-left"> Photo </label>
+										<div class="col-md-6">
+										  <input  type='file' name='photo' id='photo' <?php if($row['photo'] ==''): ?> class='required' <?php endif; ?> style='width:150px !important;'  />
+					 	<div >
+						<?php echo SiteHelpers::showUploadedFile($row['photo'],'/uploads/images'); ?>
+
+						
+						</div>					
+					 
+										 </div> 
+										 <div class="col-md-2">
+										 	
+										 </div>
+									  </div> 					
+									  <div class="form-group  " >
+										<label for="Mail" class=" control-label col-md-4 text-left"> Mail </label>
+										<div class="col-md-6">
+										  <?php echo Form::text('mail', $row['mail'],array('class'=>'form-control', 'placeholder'=>'',   )); ?> 
+										 </div> 
+										 <div class="col-md-2">
+										 	
+										 </div>
+									  </div> 					
+									  <div class="form-group  " >
+										<label for="Password" class=" control-label col-md-4 text-left"> Password </label>
+										<div class="col-md-6">
+										  <?php echo Form::text('password', $row['password'],array('class'=>'form-control', 'placeholder'=>'',   )); ?> 
+										 </div> 
+										 <div class="col-md-2">
+										 	
+										 </div>
+									  </div> 					
+									  <div class="form-group  " >
+										<label for="Nom" class=" control-label col-md-4 text-left"> Nom </label>
+										<div class="col-md-6">
+										  <?php echo Form::text('nom', $row['nom'],array('class'=>'form-control', 'placeholder'=>'',   )); ?> 
+										 </div> 
+										 <div class="col-md-2">
+										 	
+										 </div>
+									  </div> 					
+									  <div class="form-group  " >
+										<label for="Prenom" class=" control-label col-md-4 text-left"> Prenom </label>
+										<div class="col-md-6">
+										  <?php echo Form::text('prenom', $row['prenom'],array('class'=>'form-control', 'placeholder'=>'',   )); ?> 
+										 </div> 
+										 <div class="col-md-2">
+										 	
+										 </div>
+									  </div> 					
+									  <div class="form-group  " >
+										<label for="Club Id" class=" control-label col-md-4 text-left"> Club Id </label>
+										<div class="col-md-6">
+										  <select name='club_id' rows='5' id='club_id' class='select2 '   ></select> 
+										 </div> 
+										 <div class="col-md-2">
+										 	
+										 </div>
+									  </div> </fieldset>
+			</div>
+			
+			
+
+		
+			<div style="clear:both"></div>	
+				
+					
+				  <div class="form-group">
+					<label class="col-sm-4 text-right">&nbsp;</label>
+					<div class="col-sm-8">	
+					<button type="submit" name="apply" class="btn btn-info btn-sm" ><i class="icon-checkmark-circle2"></i> <?php echo e(Lang::get('core.sb_apply')); ?></button>
+					<button type="submit" name="submit" class="btn btn-primary btn-sm" ><i class="icon-bubble-check"></i> <?php echo e(Lang::get('core.sb_save')); ?></button>
+					<button type="button" onclick="location.href='<?php echo e(URL::to('joueursb?return='.$return)); ?>' " class="btn btn-warning btn-sm "><i class="icon-cancel-circle2 "></i>  <?php echo e(Lang::get('core.sb_cancel')); ?> </button>
+					</div>	  
+			
+				  </div>
+		 
+		 <?php echo Form::close(); ?>
+
+	</div>
+</div>		 
+</div>	
+</div>			 
+   <script type="text/javascript">
+	$(document).ready(function() { 
+		
+		
+		$("#club_id").jCombo("<?php echo url('joueursb/comboselect?filter=foot_club:club_id:nom'); ?>",
+		{  selected_value : '<?php echo e($row["club_id"]); ?>' });
+		 
+		
+		$('.removeMultiFiles').on('click',function(){
+			var removeUrl = '<?php echo e(url("joueursb/removefiles?file=")); ?>'+$(this).attr('url');
+			$(this).parent().remove();
+			$.get(removeUrl,function(response){});
+			$(this).parent('div').empty();	
+			return false;
+		});		
+		
+	});
+	</script>		 
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

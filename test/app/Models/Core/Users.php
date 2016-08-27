@@ -17,7 +17,8 @@ class Users extends Sximo  {
 	public static function querySelect(  ){
 		
 		return " SELECT  tb_users.*,  tb_groups.name 
-FROM tb_users LEFT JOIN tb_groups ON tb_groups.group_id = tb_users.group_id ";
+                 FROM tb_users LEFT JOIN tb_groups 
+				 ON tb_groups.group_id = tb_users.group_id ";
 	}	
 
 	public static function queryWhere(  ){

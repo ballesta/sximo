@@ -16,7 +16,21 @@
 
 <ul class="nav nav-tabs"><li class="active"><a href="#joueur" data-toggle="tab">joueur</a></li>
 				</ul><div class="tab-content"><div class="tab-pane m-t active" id="joueur"> 
-									
+				{!! Form::hidden('id', $row['id']) !!}					
+									  <div class="form-group  " >
+										<label for="Photo" class=" control-label col-md-4 text-left"> Photo </label>
+										<div class="col-md-6">
+										  <input  type='file' name='photo' id='photo' @if($row['photo'] =='') class='required' @endif style='width:150px !important;'  />
+					 	<div >
+						{!! SiteHelpers::showUploadedFile($row['photo'],'/uploads/images') !!}
+						
+						</div>					
+					 
+										 </div> 
+										 <div class="col-md-2">
+										 	
+										 </div>
+									  </div> 					
 									  <div class="form-group  " >
 										<label for="Name" class=" control-label col-md-4 text-left"> Name <span class="asterix"> * </span></label>
 										<div class="col-md-6">
@@ -27,9 +41,27 @@
 										 </div>
 									  </div> 					
 									  <div class="form-group  " >
+										<label for="Mail" class=" control-label col-md-4 text-left"> Mail </label>
+										<div class="col-md-6">
+										  {!! Form::text('mail', $row['mail'],array('class'=>'form-control', 'placeholder'=>'',   )) !!} 
+										 </div> 
+										 <div class="col-md-2">
+										 	
+										 </div>
+									  </div> 					
+									  <div class="form-group  " >
 										<label for="First name" class=" control-label col-md-4 text-left"> First name <span class="asterix"> * </span></label>
 										<div class="col-md-6">
 										  {!! Form::text('prenom', $row['prenom'],array('class'=>'form-control', 'placeholder'=>'', 'required'=>'true'  )) !!} 
+										 </div> 
+										 <div class="col-md-2">
+										 	
+										 </div>
+									  </div> 					
+									  <div class="form-group  " >
+										<label for="Mot De Passe" class=" control-label col-md-4 text-left"> Mot De Passe </label>
+										<div class="col-md-6">
+										  {!! Form::text('mot_de_passe', $row['mot_de_passe'],array('class'=>'form-control', 'placeholder'=>'',   )) !!} 
 										 </div> 
 										 <div class="col-md-2">
 										 	
@@ -66,7 +98,7 @@
 	$(document).ready(function() { 
 		
 		
-		$("#club_id").jCombo("{!! url('joueur/comboselect?filter=foot_club:id:nom') !!}",
+		$("#club_id").jCombo("{!! url('joueur/comboselect?filter=foot_club:club_id:nom') !!}",
 		{  selected_value : '{{ $row["club_id"] }}' });
 		 
 

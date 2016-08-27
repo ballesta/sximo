@@ -1,0 +1,21 @@
+INSERT INTO tb_users(group_id  , 
+						club_id   ,
+	                    extension_id, 
+                        username  ,
+                        password  ,
+                        email     ,
+                        first_name,
+                        last_name ,
+                        avatar    ,
+                        active) 
+				VALUES (3, 
+						NEW.club_id,
+						NEW.id,
+						NEW.nom,
+						NEW.password,
+						NEW.mail,
+						NEW.prenom,
+						NEW.nom,
+						NEW.photo,
+                        1
+					   )

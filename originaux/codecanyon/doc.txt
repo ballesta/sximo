@@ -19,3 +19,4 @@
 				Attention: sauver onglet SQL pour prise en compte
 		Intégration de Ajax	
 			OK			
+	decanyon\codecanyon-7899844-laravel-cms-ajax-crud-plugins\source\sximo3\protected\app\library\SiteHelpers.php 		

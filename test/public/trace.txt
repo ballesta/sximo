@@ -1,0 +1,7 @@
+-------------- trace ajax --------------\n<pre class='xdebug-var-dump' dir='ltr'>
+<small>H:\wamp-3-32\www\sximo\test\app\Models\Sximo.php:132:</small>
+<b>array</b> <i>(size=3)</i>
+  0 <font color='#888a85'>=&gt;</font> <small>string</small> <font color='#cc0000'>'foot_club'</font> <i>(length=9)</i>
+  1 <font color='#888a85'>=&gt;</font> <small>string</small> <font color='#cc0000'>'club_id'</font> <i>(length=7)</i>
+  2 <font color='#888a85'>=&gt;</font> <small>string</small> <font color='#cc0000'>'nom'</font> <i>(length=3)</i>
+</pre>
