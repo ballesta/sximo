@@ -4,12 +4,90 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sximo extends Model {
 
+	//bb
+	// Filtre les tables en fonction du groupe
+	public static function bb_filtres($table)
+	{
+		$filtres_additionels = '';
+		$club_id   = \Session::get('club_id',null);
+		$group_id  = \Session::get('gid'    ,null);
+		$joueur_id = \Session::get('uid'    ,null);
+		switch ($group_id)
+        {
+            case 1:
+            case 2:
+				// Admins : peuvent tout voir, pas de filtres particuliers
+                // Club_id peut être renseigné ou non
+				break;
+            case 10:
+                // Admin club : tout le club, rien que le club
+                // Club_id doit être renseigné
+                if (is_null($club_id))
+                    dd("Admin club:Club_id doit être renseigné");
+                else
+                {
+                    // Ajoute filtre sur club courant
+                    $filtres_additionels .= " AND {$table}.club_id = $club_id ";
+                }
+                break;
+            case 12:
+            case 14:
+				// Directeur technique, Entraineur : tout le club, rien que le club
+                // Club_id doit être renseigné
+                if (is_null($club_id))
+                    dd("Directeur technique, Entraineur: Club_id doit être renseigné");
+                else
+                {
+                    // Ajoute filtre sur club courant
+                    $filtres_additionels .= " AND {$table}.club_id = $club_id ";
+                }
+            break;
+            case 20:
+                // Staff : Ses propres donnée = Session de mesures et activites
+                // Club_id doit être renseigné
+                if (is_null($club_id))
+                    dd("Staff: Club_id doit être renseigné");
+                else
+                {
+                    // Ajoute filtre sur club courant
+                    $filtres_additionels .= " AND {$table}.club_id = $club_id ";
+                }
+                break;
+            case 30:
+				// Joueur : Ses propres donnée = Session de mesures et activites
+                // Club_id  et joureur_id doivent être renseignés
+                if (is_null($club_id)
+                ||  is_null($joueur_id))
+                    dd("Joueur: Club_id et joueur_id doit être renseigné");
+                else
+                {
+                    // Ajoute filtre sur club courant
+                    $filtres_additionels .= " AND {$table}.club_id = $club_id ";
+                    // Ajoute filtre sur joueur courant
+                    $filtres_additionels .= " AND {$table}.id = $joueur_id ";
+                }
+
+				break;
+        } // end switch role
+
+        dump("filtres_additionels : $filtres_additionels");
+		return $filtres_additionels;
+	}
+	//--
+
 
 	public static function getRows( $args )
 	{
        $table = with(new static)->table;
 	   $key = with(new static)->primaryKey;
-	   
+
+        $page= null;
+		$limit= null;
+        $sort= null;
+        $order= null;
+        $params= null;
+        $global= null;
+
         extract( array_merge( array(
 			'page' 		=> '0' ,
 			'limit'  	=> '0' ,
@@ -29,11 +107,25 @@ class Sximo extends Model {
 				$params .= " AND {$table}.entry_by ='".\Session::get('uid')."'"; 	
 		// End Update permission global / own access new ver 1.1			
         
-		$rows = array();
-	    $result = \DB::select( self::querySelect() . self::queryWhere(). " 
-				{$params} ". self::queryGroup() ." {$orderConditional}  {$limitConditional} ");
+		//bb
+		$params .= self::bb_filtres($table);
 		
-		if($key =='' ) { $key ='*'; } else { $key = $table.".".$key ; }	
+		$rows = array();
+	    $result = \DB::select( self::querySelect()
+                             . self::queryWhere()
+                             . " {$params} "
+                             . self::queryGroup()
+                             ." {$orderConditional} "
+                             ." {$limitConditional} ");
+		
+		if ($key =='' )
+		{
+		    $key ='*';
+		}
+		else
+        {
+            $key = $table.".".$key ;
+        }
 		$total = \DB::select( self::querySelect() . self::queryWhere(). " 
 				{$params} ". self::queryGroup() ." {$orderConditional}  ");
 		$total = count($total);
@@ -41,7 +133,8 @@ class Sximo extends Model {
 //		$total = $res[0]->total;
 
 
-		return $results = array('rows'=> $result , 'total' => $total);	
+		return $results = array( 'rows'  => $result
+                               , 'total' => $total);
 
 	
 	}	
