@@ -197,50 +197,38 @@ class UserController extends Controller
                         );
 
                         \Session::put('club_id', $joueur->club_id);
-                        //--
+                        //bb--
 
                         \Session::put('ll', $row->last_login);
 
                         if (\Session::get('lang') == '') {
                             \Session::put('lang', CNF_LANG);
                         }
-
                         if ($request->ajax() == true) {
                             if (CNF_FRONT == 'false') :
                                 return response()->json(['status' => 'success', 'url' => url('dashboard')]);
                             else :
                                 return response()->json(['status' => 'success', 'url' => url('')]);
                             endif;
-
                         } else {
                             if (CNF_FRONT == 'false') :
                                 return Redirect::to('dashboard');
                             else :
                                 return Redirect::to('');
                             endif;
-
                         }
-
-
                     }
-
                 }
-
             } else {
-
                 if ($request->ajax() == true) {
                     return response()->json(['status' => 'error', 'message' => 'Your username/password combination was incorrect']);
                 } else {
-
                     return Redirect::to('user/login')
                         ->with('message', \SiteHelpers::alert('error', 'Your username/password combination was incorrect'))
                         ->withInput();
                 }
-
-
             }
         } else {
-
             if ($request->ajax() == true) {
                 return response()->json(['status' => 'error', 'message' => 'The following  errors occurred']);
             } else {
@@ -249,8 +237,6 @@ class UserController extends Controller
                     ->with('message', \SiteHelpers::alert('error', 'The following  errors occurred'))
                     ->withErrors($validator)->withInput();
             }
-
-
         }
     }
 
@@ -258,7 +244,6 @@ class UserController extends Controller
     {
 
         if (!\Auth::check()) return redirect('user/login');
-
 
         $info = User::find(\Auth::user()->id);
         $this->data = array(
