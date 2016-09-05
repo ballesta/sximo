@@ -217,7 +217,7 @@ class UserController extends Controller
                                 return Redirect::to('');
                             endif;
                         }
-                    }
+                    } 
                 }
             } else {
                 if ($request->ajax() == true) {
