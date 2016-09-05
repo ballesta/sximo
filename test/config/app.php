@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'fr',
 
     /*
     |--------------------------------------------------------------------------
@@ -78,7 +78,7 @@ return [
     |
     */
 
-    'key' => env('APP_KEY', 'SomeRandomString'),
+    'key' => env('APP_KEY', '12345678901234567890123456789012'),
 
     'cipher' => 'AES-256-CBC',
 
@@ -203,7 +203,7 @@ return [
         'Socialize' => Laravel\Socialite\Facades\Socialite::class,
         'Markdown'  => GrahamCampbell\Markdown\Facades\Markdown::class,
         'Socialize' => Laravel\Socialite\Facades\Socialite::class,  
-		// 'Debugbar' => Barryvdh\Debugbar\Facade::class,
+		'Debugbar'  => Barryvdh\Debugbar\Facade::class,
 
     ],
 

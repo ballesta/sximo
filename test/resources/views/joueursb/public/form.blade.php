@@ -31,7 +31,7 @@
 										<div class="col-md-6">
 										  <input  type='file' name='photo' id='photo' @if($row['photo'] =='') class='required' @endif style='width:150px !important;'  />
 					 	<div >
-						{!! SiteHelpers::showUploadedFile($row['photo'],'/uploads/images') !!}
+						{!! SiteHelpers::showUploadedFile($row['photo'],'uploads/images') !!}
 						
 						</div>					
 					 

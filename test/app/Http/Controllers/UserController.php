@@ -132,7 +132,7 @@ class UserController extends Controller
             return View('user.login', $this->data);
 
         }
-    } 
+    }
 
     public function postSignin(Request $request)
     {
@@ -173,28 +173,20 @@ class UserController extends Controller
                         \DB::table('tb_users')->where('id', '=', $row->id)
                             ->update(array('last_login' => date("Y-m-d H:i:s")));
                         \Session::put('uid', $row->id);
-                        \Session::put('gid', $row->group_id);
+
                         \Session::put('eid', $row->email);
                         \Session::put('ll', $row->last_login);
                         \Session::put('fid', $row->first_name . ' ' . $row->last_name);
                         //bb--
                         // Ajoute le club de l'utilisateur en session
-                        // Remplacé:
-                        //\Session::put('club_id', $row->club_id);
-                        // Par:
-                        // Récupère le club_id de la table foot_joueur.
                         // Raison: ne rien modifier dans la table tb_users de Sximo
-                        //$joueur = \app\Foot_joueur::find($row->id);
                         $joueur = \DB::table('foot_joueur')->where('id', '=', $row->id)
                                                            ->first();
-                        Log::info
-                        (
-                            'Joueur : ',
-                            [
-                                 'id' => $row->id,
-                             'Joueur' => $joueur
-                            ]
-                        );
+
+                        Log::info('Joueur : ', ['Joueur' => $joueur]);
+
+                        $group_id = $joueur->group_id;
+                        \Session::put('gid', $group_id);
 
                         \Session::put('club_id', $joueur->club_id);
                         //bb--

@@ -6,51 +6,48 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Validator, Input, Redirect ; 
 
-
 class JoueursbController extends Controller {
 
 	protected $layout = "layouts.main";
 	protected $data = array();	
 	public $module = 'joueursb';
 	static $per_page	= '10';
-
-	public function __construct()
+	
+	public function __construct() 
 	{
-		
-		$this->beforeFilter('csrf', array('on'=>'post'));
+		parent::__construct();
 		$this->model = new Joueursb();
 		
 		$this->info = $this->model->makeInfo( $this->module);
 		$this->access = $this->model->validAccess($this->info['id']);
 	
 		$this->data = array(
-			'pageTitle'	=> 	$this->info['title'],
-			'pageNote'	=>  $this->info['note'],
-			'pageModule'=> 'joueursb',
-			'return'	=> self::returnUrl()
-			
-		);
-		
-		\App::setLocale(CNF_LANG);
-		if (defined('CNF_MULTILANG') && CNF_MULTILANG == '1') {
-
-		$lang = (\Session::get('lang') != "" ? \Session::get('lang') : CNF_LANG);
-		\App::setLocale($lang);
-		}  
-
-
-		
-	}
-
-	public function getIndex( Request $request )
+			'pageTitle'			=> 	$this->info['title'],
+			'pageNote'			=>  $this->info['note'],
+			'pageModule'		=> 'joueursb',
+			'pageUrl'			=>  url('joueursb'),
+			'return' 			=> 	self::returnUrl()	
+		);		
+				
+	} 
+	
+	public function getIndex()
 	{
-
 		if($this->access['is_view'] ==0) 
-			return Redirect::to('dashboard')
-				->with('messagetext', \Lang::get('core.note_restric'))->with('msgstatus','error');
+			return Redirect::to('dashboard')->with('messagetext',\Lang::get('core.note_restric'))->with('msgstatus','error');
+				
+		$this->data['access']		= $this->access;	
+		return view('joueursb.index',$this->data);
+	}	
 
-		$sort = (!is_null($request->input('sort')) ? $request->input('sort') : 'id'); 
-		$order = (!is_null($request->input('order')) ? $request->input('order') : 'asc');
+	public function postData( Request $request)
+	{
+	    //dd($this);
+		$sort = (!is_null($request->input('sort')) ?
+                 $request->input('sort')
+                 :
+                 $this->info['config']['setting']['orderby']);
+		$order = (!is_null($request->input('order')) ? $request->input('order') : $this->info['setting']['ordertype']);
 		// End Filter sort and order for query 
 		// Filter Search for query		
 		$filter = '';	
@@ -65,7 +62,7 @@ class JoueursbController extends Controller {
 		$page = $request->input('page', 1);
 		$params = array(
 			'page'		=> $page ,
-			'limit'		=> (!is_null($request->input('rows')) ? filter_var($request->input('rows'),FILTER_VALIDATE_INT) : static::$per_page ) ,
+			'limit'		=> (!is_null($request->input('rows')) ? filter_var($request->input('rows'),FILTER_VALIDATE_INT) : $this->info['setting']['perpage'] ) ,
 			'sort'		=> $sort ,
 			'order'		=> $order,
 			'params'	=> $filter,
@@ -77,8 +74,9 @@ class JoueursbController extends Controller {
 		// Build pagination setting
 		$page = $page >= 1 && filter_var($page, FILTER_VALIDATE_INT) !== false ? $page : 1;	
 		$pagination = new Paginator($results['rows'], $results['total'], $params['limit']);	
-		$pagination->setPath('joueursb');
+		$pagination->setPath('joueursb/data');
 		
+		$this->data['param']		= $params;
 		$this->data['rowData']		= $results['rows'];
 		// Build Pagination 
 		$this->data['pagination']	= $pagination;
@@ -93,18 +91,19 @@ class JoueursbController extends Controller {
 		// Group users permission
 		$this->data['access']		= $this->access;
 		// Detail from master if any
-		$this->data['fields'] =  \AjaxHelpers::fieldLang($this->info['config']['grid']);
+		$this->data['setting'] 		= $this->info['setting'];
+		
 		// Master detail link if any 
 		$this->data['subgrid']	= (isset($this->info['config']['subgrid']) ? $this->info['config']['subgrid'] : array()); 
 		// Render into template
-		return view('joueursb.index',$this->data);
-	}	
+		return view('joueursb.table',$this->data);
 
+	}
 
-
+			
 	function getUpdate(Request $request, $id = null)
 	{
-	
+
 		if($id =='')
 		{
 			if($this->access['is_add'] ==0 )
@@ -120,117 +119,134 @@ class JoueursbController extends Controller {
 		$row = $this->model->find($id);
 		if($row)
 		{
-			$this->data['row'] =  $row;
+			$this->data['row'] 		=  $row;
 		} else {
-			$this->data['row'] = $this->model->getColumnTable('foot_joueur'); 
+			$this->data['row'] 		= $this->model->getColumnTable('foot_joueur'); 
 		}
-		$this->data['fields'] =  \AjaxHelpers::fieldLang($this->info['config']['forms']);
+		$this->data['setting'] 		= $this->info['setting'];
+		$this->data['fields'] 		=  \AjaxHelpers::fieldLang($this->info['config']['forms']);
 		
 		$this->data['id'] = $id;
+
 		return view('joueursb.form',$this->data);
 	}	
 
-	public function getShow( Request $request, $id = null)
+	public function getShow( $id = null)
 	{
-
+	
 		if($this->access['is_detail'] ==0) 
-		return Redirect::to('dashboard')
-			->with('messagetext', \Lang::get('core.note_restric'))->with('msgstatus','error');
+			return Redirect::to('dashboard')
+				->with('messagetext', \Lang::get('core.note_restric'))->with('msgstatus','error');
 					
 		$row = $this->model->getRow($id);
 		if($row)
 		{
 			$this->data['row'] =  $row;
-			$this->data['fields'] 		=  \SiteHelpers::fieldLang($this->info['config']['grid']);
+			
 			$this->data['id'] = $id;
 			$this->data['access']		= $this->access;
-			$this->data['subgrid']	= (isset($this->info['config']['subgrid']) ? $this->info['config']['subgrid'] : array()); 
-			$this->data['fields'] =  \AjaxHelpers::fieldLang($this->info['config']['grid']);
+			$this->data['setting'] 		= $this->info['setting'];
+			$this->data['fields'] 		= \AjaxHelpers::fieldLang($this->info['config']['grid']);
+			$this->data['subgrid']		= (isset($this->info['config']['subgrid']) ? $this->info['config']['subgrid'] : array());
 			return view('joueursb.view',$this->data);
+
 		} else {
-			return Redirect::to('joueursb')->with('messagetext','Record Not Found !')->with('msgstatus','error');					
-		}
-	}
+
+			return response()->json(array(
+				'status'=>'error',
+				'message'=> \Lang::get('core.note_error')
+			));		
+		}		
+	}	
+
 
 	function postCopy( Request $request)
 	{
+		
 	    foreach(\DB::select("SHOW COLUMNS FROM foot_joueur ") as $column)
         {
 			if( $column->Field != 'id')
 				$columns[] = $column->Field;
         }
-		
 		if(count($request->input('ids')) >=1)
 		{
+
 			$toCopy = implode(",",$request->input('ids'));
+			
+					
 			$sql = "INSERT INTO foot_joueur (".implode(",", $columns).") ";
 			$sql .= " SELECT ".implode(",", $columns)." FROM foot_joueur WHERE id IN (".$toCopy.")";
 			\DB::select($sql);
-			return Redirect::to('joueursb')->with('messagetext',\Lang::get('core.note_success'))->with('msgstatus','success');
+			return response()->json(array(
+				'status'=>'success',
+				'message'=> \Lang::get('core.note_success')
+			));		
+
 		} else {
-		
-			return Redirect::to('joueursb')->with('messagetext','Please select row to copy')->with('msgstatus','error');
-		}	
-		
+			return response()->json(array(
+				'status'=>'success',
+				'message'=> 'Please select row to copy'
+			));	
+		}
+
+	
 	}		
 
-	function postSave( Request $request)
+	function postSave( Request $request, $id =0)
 	{
 		
 		$rules = $this->validateForm();
 		$validator = Validator::make($request->all(), $rules);	
 		if ($validator->passes()) {
-			$data = $this->validatePost('tb_joueursb');
-				
+			$data = $this->validatePost('foot_joueur');
+			
 			$id = $this->model->insertRow($data , $request->input('id'));
 			
-			if(!is_null($request->input('apply')))
-			{
-				$return = 'joueursb/update/'.$id.'?return='.self::returnUrl();
-			} else {
-				$return = 'joueursb?return='.self::returnUrl();
-			}
-
-			// Insert logs into database
-			if($request->input('id') =='')
-			{
-				\SiteHelpers::auditTrail( $request , 'New Data with ID '.$id.' Has been Inserted !');
-			} else {
-				\SiteHelpers::auditTrail($request ,'Data with ID '.$id.' Has been Updated !');
-			}
-
-			return Redirect::to($return)->with('messagetext',\Lang::get('core.note_success'))->with('msgstatus','success');
+			return response()->json(array(
+				'status'=>'success',
+				'message'=> \Lang::get('core.note_success')
+				));	
 			
 		} else {
 
-			return Redirect::to('joueursb/update/'. $request->input('id'))->with('messagetext',\Lang::get('core.note_error'))->with('msgstatus','error')
-			->withErrors($validator)->withInput();
+			$message = $this->validateListError(  $validator->getMessageBag()->toArray() );
+			return response()->json(array(
+				'message'	=> $message,
+				'status'	=> 'error'
+			));	
 		}	
 	
 	}	
 
 	public function postDelete( Request $request)
 	{
-		
-		if($this->access['is_remove'] ==0) 
-			return Redirect::to('dashboard')
-				->with('messagetext', \Lang::get('core.note_restric'))->with('msgstatus','error');
+
+		if($this->access['is_remove'] ==0) {   
+			return response()->json(array(
+				'status'=>'error',
+				'message'=> \Lang::get('core.note_restric')
+			));
+			die;
+
+		}		
 		// delete multipe rows 
 		if(count($request->input('ids')) >=1)
 		{
 			$this->model->destroy($request->input('ids'));
 			
-			\SiteHelpers::auditTrail( $request , "ID : ".implode(",",$request->input('ids'))."  , Has Been Removed Successfull");
-			// redirect
-			return Redirect::to('joueursb')
-        		->with('messagetext', \Lang::get('core.note_success_delete'))->with('msgstatus','success'); 
-	
+			return response()->json(array(
+				'status'=>'success',
+				'message'=> \Lang::get('core.note_success_delete')
+			));
 		} else {
-			return Redirect::to('joueursb')
-        		->with('messagetext','No Item Deleted')->with('msgstatus','error');				
-		}
+			return response()->json(array(
+				'status'=>'error',
+				'message'=> \Lang::get('core.note_error')
+			));
 
-	}	
+		} 		
+
+	}
 
 	public static function display( )
 	{
@@ -300,8 +316,6 @@ class JoueursbController extends Controller {
 		}	
 	
 	}	
-
-
-
+				
 
 }

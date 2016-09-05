@@ -1,24 +1,16 @@
-@extends('layouts.app')
 
-@section('content')
+@if($setting['form-method'] =='native')
+	<div class="sbox">
+		<div class="sbox-title">  
+			<h4> <i class="fa fa-table"></i> <?php echo $pageTitle ;?> <small>{{ $pageNote }}</small>
+				<a href="javascript:void(0)" class="collapse-close pull-right btn btn-xs btn-danger" onclick="ajaxViewClose('#{{ $pageModule }}')"><i class="fa fa fa-times"></i></a>
+			</h4>
+	</div>
 
-  <div class="page-content row">
-
- 	<div class="page-content-wrapper m-t">
-
-
-<div class="sbox">
-	<div class="sbox-title"> <h3> {{ $pageTitle }} <small>{{ $pageNote }}</small></h3> </div>
-	<div class="sbox-content"> 	
-
-		<ul class="parsley-error-list">
-			@foreach($errors->all() as $error)
-				<li>{{ $error }}</li>
-			@endforeach
-		</ul>	
-
-		 {!! Form::open(array('url'=>'joueursb/save?return='.$return, 'class'=>'form-horizontal','files' => true , 'parsley-validate'=>'','novalidate'=>' ')) !!}
-<div class="col-md-12">
+	<div class="sbox-content"> 
+@endif	
+			{!! Form::open(array('url'=>'joueursb/save/'.SiteHelpers::encryptID($row['id']), 'class'=>'form-horizontal','files' => true , 'parsley-validate'=>'','novalidate'=>' ','id'=> 'joueursbFormAjax')) !!}
+			<div class="col-md-12">
 						<fieldset><legend> joueursB</legend>
 									
 									  <div class="form-group  " >
@@ -35,7 +27,7 @@
 										<div class="col-md-6">
 										  <input  type='file' name='photo' id='photo' @if($row['photo'] =='') class='required' @endif style='width:150px !important;'  />
 					 	<div >
-						{!! SiteHelpers::showUploadedFile($row['photo'],'/uploads/images') !!}
+						{!! SiteHelpers::showUploadedFile($row['photo'],'uploads/images') !!}
 						
 						</div>					
 					 
@@ -91,43 +83,92 @@
 									  </div> </fieldset>
 			</div>
 			
-			
-
-		
+												
+								
+						
 			<div style="clear:both"></div>	
-				
-					
-				  <div class="form-group">
-					<label class="col-sm-4 text-right">&nbsp;</label>
-					<div class="col-sm-8">	
-					<button type="submit" name="apply" class="btn btn-info btn-sm" ><i class="icon-checkmark-circle2"></i> {{ Lang::get('core.sb_apply') }}</button>
-					<button type="submit" name="submit" class="btn btn-primary btn-sm" ><i class="icon-bubble-check"></i> {{ Lang::get('core.sb_save') }}</button>
-					<button type="button" onclick="location.href='{{ URL::to('joueursb?return='.$return) }}' " class="btn btn-warning btn-sm "><i class="icon-cancel-circle2 "></i>  {{ Lang::get('core.sb_cancel') }} </button>
-					</div>	  
-			
-				  </div>
-		 
-		 {!! Form::close() !!}
-	</div>
-</div>		 
+							
+			<div class="form-group">
+				<label class="col-sm-4 text-right">&nbsp;</label>
+				<div class="col-sm-8">	
+					<button type="submit" class="btn btn-primary btn-sm "><i class="icon-checkmark-circle2"></i>  {{ Lang::get('core.sb_save') }} </button>
+					<button type="button" onclick="ajaxViewClose('#{{ $pageModule }}')" class="btn btn-success btn-sm"><i class="icon-cancel-circle2 "></i>  {{ Lang::get('core.sb_cancel') }} </button>
+				</div>			
+			</div> 		 
+			{!! Form::close() !!}
+
+
+@if($setting['form-method'] =='native')
+	</div>	
 </div>	
-</div>			 
-   <script type="text/javascript">
-	$(document).ready(function() { 
-		
-		
+@endif	
+
+	
+</div>	
+			 
+<script type="text/javascript">
+$(document).ready(function() { 
+	
 		$("#club_id").jCombo("{!! url('joueursb/comboselect?filter=foot_club:club_id:nom') !!}",
 		{  selected_value : '{{ $row["club_id"] }}' });
 		 
-		
+	
+	$('.editor').summernote();
+	$('.previewImage').fancybox();	
+	$('.tips').tooltip();	
+	$(".select2").select2({ width:"98%"});	
+	$('.date').datepicker({format:'yyyy-mm-dd',autoClose:true})
+	$('.datetime').datetimepicker({format: 'yyyy-mm-dd hh:ii:ss'}); 
+	$('input[type="checkbox"],input[type="radio"]').iCheck({
+		checkboxClass: 'icheckbox_square-red',
+		radioClass: 'iradio_square-red',
+	});			
 		$('.removeMultiFiles').on('click',function(){
 			var removeUrl = '{{ url("joueursb/removefiles?file=")}}'+$(this).attr('url');
 			$(this).parent().remove();
 			$.get(removeUrl,function(response){});
 			$(this).parent('div').empty();	
 			return false;
-		});		
+		});
+				
+	var form = $('#joueursbFormAjax'); 
+	form.parsley();
+	form.submit(function(){
 		
+		if(form.parsley('isValid') == true){			
+			var options = { 
+				dataType:      'json', 
+				beforeSubmit :  showRequest,
+				success:       showResponse  
+			}  
+			$(this).ajaxSubmit(options); 
+			return false;
+						
+		} else {
+			return false;
+		}		
+	
 	});
-	</script>		 
-@stop
+
+});
+
+function showRequest()
+{
+	$('.ajaxLoading').show();		
+}  
+function showResponse(data)  {		
+	
+	if(data.status == 'success')
+	{
+		ajaxViewClose('#{{ $pageModule }}');
+		ajaxFilter('#{{ $pageModule }}','{{ $pageUrl }}/data');
+		notyMessage(data.message);	
+		$('#sximo-modal').modal('hide');	
+	} else {
+		notyMessageError(data.message);	
+		$('.ajaxLoading').hide();
+		return false;
+	}	
+}			 
+
+</script>		 
