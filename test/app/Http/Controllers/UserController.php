@@ -149,7 +149,7 @@ class UserController extends Controller
 
             if (\Auth::attempt(array('email' => $request->input('email'), 'password' => $request->input('password')), $remember)) {
                 if (\Auth::check()) {
-                    $row = User::find(\Auth::user()->id);
+                    $row = User::find(\Auth::user()->id); 
 
                     if ($row->active == '0') {
                         // inactive
