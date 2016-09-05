@@ -219,7 +219,7 @@ class UserController extends Controller
                         }
                     }
                 }
-            } else { 
+            } else {
                 if ($request->ajax() == true) {
                     return response()->json(['status' => 'error', 'message' => 'Your username/password combination was incorrect']);
                 } else {
