@@ -16,6 +16,7 @@ class JoueursbController extends Controller {
 
 	public function __construct()
 	{
+		
 		$this->beforeFilter('csrf', array('on'=>'post'));
 		$this->model = new Joueursb();
 		
@@ -27,6 +28,7 @@ class JoueursbController extends Controller {
 			'pageNote'	=>  $this->info['note'],
 			'pageModule'=> 'joueursb',
 			'return'	=> self::returnUrl()
+			
 		);
 		
 		\App::setLocale(CNF_LANG);
@@ -174,6 +176,7 @@ class JoueursbController extends Controller {
 
 	function postSave( Request $request)
 	{
+		 
 		$rules = $this->validateForm();
 		$validator = Validator::make($request->all(), $rules);	
 		if ($validator->passes()) {
@@ -182,12 +185,18 @@ class JoueursbController extends Controller {
 			//bb
 			if($request->input('id') =='')
 			{
+			    // Création : hacher
 				$data['password'] = \Hash::make(Input::get('password'));
 			} else {
+			    // Modification
 				if(Input::get('password') !='')
 				{
+				    // Mot de passe rempli : Hacher
 					$data['password'] = \Hash::make(Input::get('password'));
-				} else {
+				} 
+				else 
+				{
+					// Mot de passe non rempli: ignorer
 					unset($data['password']);
 				}
 			}

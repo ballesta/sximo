@@ -479,10 +479,6 @@ abstract class Controller extends BaseController {
 		if($global == 0 )
 			$data['entry_by'] = \Session::get('uid');
 
-		//bb Force club id to 1
-		//\Session::put('club_id',1);
-		//$data['club_id'] = \Session::get('club_id');
-			
 		/* Added for Compatibility laravel 5.2 */
 		$values = array();
 		foreach($data as $key=>$val)
@@ -742,7 +738,8 @@ function detailviewsave( $model ,$request , $detail , $id )
 
 	{
 
-		\DB::table($detail['table'])->where($detail['key'],$request[$detail['key']])->delete();
+		\DB::table($detail['table'])->where($detail['key'],$request[$detail['key']])
+                                    ->delete();
 		$info = $model->makeInfo( $detail['module'] );
 		$access = $model->validAccess($info['id']);
 		$str = $info['config']['forms'];
@@ -752,8 +749,8 @@ function detailviewsave( $model ,$request , $detail , $id )
 		$total = count($request['counter']);
 		for($i=0; $i<$total;$i++)
 		{
-			foreach($str as $f){
-
+			foreach($str as $f)
+			{
 				$field = $f['field'];
 				if($f['view'] ==1) 
 				{

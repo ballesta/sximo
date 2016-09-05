@@ -78,29 +78,28 @@ class UserController extends Controller {
 			
 				if(defined('CNF_MAIL') && CNF_MAIL =='swift')
 				{ 
-					Mail::send('user.emails.registration', $data, function ($message) {
-			    		$message->to($to)->subject($subject);
-			    	});	
-
-				}  else {
-		
+					Mail::send('user.emails.registration',
+                                $data,
+                                function ($message)
+                                {
+			    		           $message->to($to)->subject($subject);
+			    	            }
+                              );
+				}
+				else
+                {
 					$message = view('user.emails.registration', $data);
 					$headers  = 'MIME-Version: 1.0' . "\r\n";
 					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 					$headers .= 'From: '.CNF_APPNAME.' <'.CNF_EMAIL.'>' . "\r\n";
-						mail($to, $subject, $message, $headers);	
+					mail($to, $subject, $message, $headers);
 				}
-
 				$message = "Thanks for registering! . Please check your inbox and follow activation link";
-								
 			} elseif(CNF_ACTIVATION=='manual') {
 				$message = "Thanks for registering! . We will validate you account before your account active";
 			} else {
-   			 	$message = "Thanks for registering! . Your account is active now ";         
-			
-			}	
-
-
+   			 	$message = "Thanks for registering! . Your account is active now ";
+			}
 			return Redirect::to('user/login')->with('message',\SiteHelpers::alert('success',$message));
 		} else {
 			return Redirect::to('user/register')->with('message',\SiteHelpers::alert('error','The following errors occurred')
@@ -184,16 +183,24 @@ class UserController extends Controller {
 					} 
 					else 
 					{
-						\DB::table('tb_users')->where('id', '=',$row->id )->update(array('last_login' => date("Y-m-d H:i:s")));
+						\DB::table('tb_users')->where('id', '=',$row->id )
+                                              ->update(array('last_login' => date("Y-m-d H:i:s")));
 						\Session::put('uid', $row->id);
 						\Session::put('gid', $row->group_id);
 						\Session::put('eid', $row->email);
 						\Session::put('ll', $row->last_login);
 						\Session::put('fid', $row->first_name.' '. $row->last_name);
-						//bb
+						//bb--
 						// Ajoute le club de l'utilisateur en session
-						\Session::put('club_id', $row->club_id);						
-						//--
+						// Remplacé:
+                        //\Session::put('club_id', $row->club_id);
+						// Par:
+                        // Récupère le club_id de la table foot_joueur.
+                        // Raison: ne rien modifier dans la table tb_users de Sximo
+                        $joueur = \app\foot_joueur::find($row->id);
+                        \Session::put('club_id', $joueur->club_id);
+                        //--
+
 						\Session::put('ll', $row->last_login);
 						
 						if(\Session::get('lang') =='')

@@ -176,30 +176,12 @@ class JoueursbController extends Controller {
 
 	function postSave( Request $request)
 	{
-		 
+		
 		$rules = $this->validateForm();
 		$validator = Validator::make($request->all(), $rules);	
 		if ($validator->passes()) {
 			$data = $this->validatePost('tb_joueursb');
 				
-			//bb
-			if($request->input('id') =='')
-			{
-			    // Création : hacher
-				$data['password'] = \Hash::make(Input::get('password'));
-			} else {
-			    // Modification
-				if(Input::get('password') !='')
-				{
-				    // Mot de passe rempli : Hacher
-					$data['password'] = \Hash::make(Input::get('password'));
-				} else {
-					// Mot de passe non rempli: ignorer
-					unset($data['password']);
-				}
-			}
-				
-			//--	
 			$id = $this->model->insertRow($data , $request->input('id'));
 			
 			if(!is_null($request->input('apply')))
