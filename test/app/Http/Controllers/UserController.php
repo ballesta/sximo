@@ -132,7 +132,7 @@ class UserController extends Controller
             return View('user.login', $this->data);
 
         }
-    }
+    } 
 
     public function postSignin(Request $request)
     {
@@ -144,7 +144,7 @@ class UserController extends Controller
         if (CNF_RECAPTCHA == 'true') $rules['captcha'] = 'required|captcha';
         $validator = Validator::make(Input::all(), $rules);
         if ($validator->passes())
-        { 
+        {
             $remember = (!is_null($request->get('remember')) ? 'true' : 'false');
 
             if (\Auth::attempt(array('email' => $request->input('email'), 'password' => $request->input('password')), $remember)) {
